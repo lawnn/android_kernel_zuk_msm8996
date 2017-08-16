@@ -134,10 +134,10 @@ if [ "$BUILD_SELECT" != 'image' -a "$BUILD_SELECT" != 'i' ]; then
     fi
     nice -n 10 make O=${OBJ_DIR} $THREAD 2>&1 | tee make.log || exit -1
 fi
-    echo -e "${green}"
-    echo ""
-    echo "=====> CREATE RELEASE IMAGE"
-   　echo -e "${restore}"
+echo -e "${green}"
+echo ""
+echo "=====> CREATE RELEASE IMAGE"
+echo -e "${restore}"
 }
 
 check_compile_error()
@@ -164,9 +164,9 @@ mkdir -p $BIN_DIR
 module_stock()
 {
 if [ -d $ANYKERNEL_DIR ]; then
-　　　　rm -rf $ANYKERNEL_DIR/modules/
-　　　　mkdir $ANYKERNEL_DIR/modules
-　　　　find $OBJ_DIR -name '*.ko' -exec cp -av {} $ANYKERNEL_DIR/modules/ \;
+rm -rf $ANYKERNEL_DIR/modules/
+mkdir $ANYKERNEL_DIR/modules
+find $OBJ_DIR -name '*.ko' -exec cp -av {} $ANYKERNEL_DIR/modules/ \;
 fi
 if [ -d $RAMDISK_SRC_DIR ]; then
 　　　　mkdir $BIN_DIR/modules
@@ -185,8 +185,8 @@ fi
 zip_anykernel()
 {
 if [ -d $ANYKERNEL_DIR ]; then
-    cd $ANYKERNEL_DIR
     cp -rf $OBJ_DIR/arch/arm64/boot/Image.gz-dtb $ANYKERNEL_DIR/zImage
+    cd $ANYKERNEL_DIR
     zip -r9 `echo $BUILD_LOCALVERSION`.zip *
     mv `echo $BUILD_LOCALVERSION`.zip $ZIP_MOVE
     find . -name "*.zip" -type f
@@ -250,6 +250,8 @@ fi
 #########                       end function                            #########
 #################################################################################
 
+DATE_START=$(date +"%s")
+
 echo ""
 echo "====================================================================="
 echo "    BUILD START (KERNEL VERSION $BUILD_LOCALVERSION)"
@@ -268,23 +270,26 @@ compile
 check_compile_error
 clean_release_dir
 module_stock
+zip_anykernel
 make_boot_image
 make_boot_zip
-　　　　cd $KERNEL_DIR
-　　　　DATE_END=$(date +"%s")
-　　　　DIFF=$(($DATE_END - $DATE_START))
-　　　　echo ""
-　　　　echo -e "${green}"
-　　　　echo "====================================================================="
-　　　　echo "    BUILD COMPLETED"
+cd $KERNEL_DIR
+echo ""
+echo -e "${green}"
+echo "====================================================================="
+echo "    BUILD COMPLETED"
 if [ -d $ANYKERNEL_DIR ]; then
-    echo "    $ZIP_MOVE/$BUILD_LOCALVERSION.zip"
+echo "    $BIN_DIR/$BUILD_LOCALVERSION.zip"
 fi
 if [ -d $RAMDISK_SRC_DIR ]; then
-    echo "    $BIN_DIR/$BUILD_LOCALVERSION.zip"
+echo "    $BIN_DIR/$BUILD_LOCALVERSION.zip"
 fi
-　　　　echo "Time: $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds."
-　　　　echo "====================================================================="
-　　　　echo -e "${restore}"
-　　　　echo ""
-　　　　exit 0
+echo "====================================================================="
+echo -e "${restore}"
+echo ""
+
+DATE_END=$(date +"%s")
+DIFF=$(($DATE_END - $DATE_START))
+echo "Time: $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds."
+echo
+exit 0
