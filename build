@@ -45,7 +45,7 @@ KERNEL_TAGS_OFFSET=0x00000100
 KERNEL_PAGESIZE=4096
 
 # set defconfig
-KERNEL_DEFCONFIG=z2_plus_defconfig
+KERNEL_DEFCONFIG=z2_defconfig
 
 # ramdisk path
 RAMDISK_SRC_DIR=../z2_boot_ramdisk
